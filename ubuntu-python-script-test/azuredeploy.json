@@ -295,7 +295,7 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "commandToExecute": "[concat(variables('commandPrefix'), variables('wgetConfigPrefix'), variables('wgetConfigPostfix'),
-            '&&', variables('commandPrefix'), variables('wgetInitPrefix'), parameters('adminUsername'), variables('wgetInitPostfix'))]"
+            ' &&', variables('commandPrefix'), variables('wgetInitPrefix'), parameters('adminUsername'), variables('wgetInitPostfix'))]"
         }
       }
     }
