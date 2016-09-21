@@ -2,113 +2,101 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "newStorageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique DNS Name Prefix for the Storage Account where the Virtual Machine's disks will be placed.  StorageAccounts may contain at most variables('vmsPerStorageAccount')"
+      }
+    },
     "adminUsername": {
       "type": "string",
-      "minLength": 1,
+      "defaultValue": "azureuser",
       "metadata": {
-        "description": "User name for the Web Server VM."
+        "description": "User name for the Virtual Machine."
       }
     },
     "adminPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "Password for the Web Server VM."
+        "description": "Password for the Virtual Machine."
       }
     },
     "dnsNameForPublicIP": {
       "type": "string",
-      "minLength": 1,
       "metadata": {
-        "description": "Globally unique DNS Name for the Public IP used to access the Web Server VM."
+        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
     },
-    "ubuntuOSVersion": {
+    "vmSize": {
       "type": "string",
-      "defaultValue": "16.04.0-LTS",
+      "defaultValue": "Standard_D2",
       "allowedValues": [
-        "14.04.5-LTS",
-        "16.04.0-LTS"
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4",
+        "Standard_D11",
+        "Standard_D12",
+        "Standard_D13",
+        "Standard_D14"
       ],
       "metadata": {
-        "description": "The Ubuntu version for the Web Server VM. Allowed values: 14.04.5-LTS, 16.04.0-LTS"
+        "description": "The VM role size of the jump box"
       }
-    },
-    "wgetAddressJava": {
-      "type": "string",
-      "metadata": {
-        "description": "Repository to download Oracle JDK."
-      }
-    },
-    "wgetAddressActiveMQ": {
-      "type": "string",
-      "metadata": {
-        "description": "Repository to download Apache ActiveMQ."
-      }
-    },
-    "_artifactsLocation": {
-      "type": "string",
-      "metadata": {
-        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-      },
-      "defaultValue": "https://github.com/azuredeploy/azure-quickstart-templates/ubuntu-python-script-test/"
-    },
-    "_artifactsLocationSasToken": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-      },
-      "defaultValue": ""
     }
   },
   "variables": {
-    "imagePublisher": "Canonical",
-    "imageOffer": "UbuntuServer",
-    "OSDiskName": "[concat('webtestosdisk-', parameters('dnsNameForPublicIP'))]",
-    "nicName": "[concat('webtestnic-', parameters('dnsNameForPublicIP'), '-', uniqueString(resourceGroup().id))]",
-    "addressPrefix": "10.0.0.0/16",
-    "subnetName": "Subnet",
-    "subnetPrefix": "10.0.0.0/24",
-    "vhdStorageType": "Standard_LRS",
+    "vmName": "test",
+    "availabilitySetNodes": "avail-set",
+    "osImagePublisher": "Canonical",
+    "osImageOffer": "UbuntuServer",
+    "osImageSKU" : "16.04.0-LTS",
+    "publicIPAddressName": "myPublicIP",
     "publicIPAddressType": "Dynamic",
-    "vhdStorageContainerName": "vhds",
-    "vmName": "[concat('webtestvm-', parameters('dnsNameForPublicIP'), '-', uniqueString(resourceGroup().id))]",
-    "vmSize": "Standard_D2_v2",
-    "virtualNetworkName": "[concat('webtestvnet-', uniqueString(resourceGroup().id, parameters('dnsNameForPublicIP')))]",
-    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
-    "vhdStorageName": "[concat('webtestvhd', uniqueString(resourceGroup().id, parameters('dnsNameForPublicIP')))]",
-    "singleQuote": "'",
-    "frontEndNSGName": "[concat('webtestnsg-', uniqueString(resourceGroup().id, parameters('dnsNameForPublicIP')))]",
-    "scriptFolder": "scripts",
-    "serverPrepareScriptFileName": "initserver.sh"
-  },
-  "outputs": {
-    "fqdn": {
-      "type": "string",
-      "value": "[reference(parameters('dnsNameForPublicIP')).dnsSettings.fqdn]"
-    }
+    "customScriptLocation": "https://raw.githubusercontent.com/azuredeploy/azure-quickstart-templates/ubuntu-python-script-test",
+    "wgetCommandPrefix": "[concat('wget --tries 20 --retry-connrefused --waitretry=15 -qO- ', variables('customScriptLocation'), 'configure-ubuntu.sh | nohup /bin/bash -s ')]",
+    "wgetCommandPostfix":  " > /var/log/azure/firstinstall.log 2>&1 &'",
+    "commandPrefix": "/bin/bash -c '",
+    "OSDiskName": "osdisk",
+    "nicName": "vmNic",
+    "virtualNetworkName": "VNET",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+    "subnetName": "Subnet",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetPrefix": "10.0.0.0/24",
+    "nsgName": "node-nsg",
+    "nsgID": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('nsgName'))]",
+    "storageAccountType": "Standard_LRS",
+    "vhdBlobContainer": "vhds",
+    "nodesLbName": "nodeslb",
+    "nodesLbID": "[resourceId('Microsoft.Network/loadBalancers',variables('nodesLbName'))]",
+    "nodesLbIPConfigName": "NodesLBFrontEnd",
+    "nodesLbIPConfigID": "[concat(variables('nodesLbID'),'/frontendIPConfigurations/', variables('nodesLbIPConfigName'))]",
+    "nodesLbBackendPoolName": "node-pool"
   },
   "resources": [
     {
-      "apiVersion": "2015-06-15",
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('vhdStorageName')]",
+      "name": "[parameters('newStorageAccountName')]",
+      "apiVersion": "2015-05-01-preview",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "StorageAccount"
-      },
       "properties": {
-        "accountType": "[variables('vhdStorageType')]"
+        "accountType": "[variables('storageAccountType')]"
       }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('availabilitySetNodes')]",
+      "location": "[resourceGroup().location]",
+      "properties": {}
     },
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[parameters('dnsNameForPublicIP')]",
+      "name": "[variables('publicIPAddressName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "PublicIPAddress"
-      },
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
         "dnsSettings": {
@@ -121,9 +109,9 @@
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "VirtualNetwork"
-      },
+      "dependsOn": [
+        "[variables('nsgID')]"
+      ],
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -134,7 +122,10 @@
           {
             "name": "[variables('subnetName')]",
             "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]"
+              "addressPrefix": "[variables('subnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[variables('nsgID')]"
+              }
             }
           }
         ]
@@ -143,38 +134,21 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('frontEndNSGName')]",
+      "name": "[variables('nsgName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "NSG - Web Server"
-      },
       "properties": {
         "securityRules": [
           {
-            "name": "ssh-rule",
+            "name": "ssh",
             "properties": {
-              "description": "Allow SSH",
+              "description": "SSH",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "22",
-              "sourceAddressPrefix": "Internet",
+              "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
               "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "web-rule",
-            "properties": {
-              "description": "Allow Web",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "80",
-              "sourceAddressPrefix": "Internet",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 101,
+              "priority": 200,
               "direction": "Inbound"
             }
           }
@@ -184,34 +158,77 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('nicName')]",
+      "name": "[concat(variables('vmName'), '-nic')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "NetworkInterface"
-      },
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('dnsNameForPublicIP'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('frontEndNSGName'))]"
+        "[concat('Microsoft.Network/loadBalancers/', variables('nodesLbName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
       "properties": {
         "ipConfigurations": [
           {
-            "name": "ipconfig1",
+            "name": "ipConfigNode",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('dnsNameForPublicIP'))]"
-              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[concat(split(variables('subnetPrefix'),'0/24')[0], '100')]",
               "subnet": {
                 "id": "[variables('subnetRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(variables('nodesLbID'), '/backendAddressPools/', variables('nodesLbBackendPoolName'))]"
+                }
+              ],
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[concat(variables('nodesLbID'),'/inboundNatRules/SSH-',variables('vmName'))]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "name": "[variables('nodesLbName')]",
+      "type": "Microsoft.Network/loadBalancers",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "[variables('nodesLbIPConfigName')]",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
               }
             }
           }
         ],
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('frontEndNSGName'))]"
-        }
+        "backendAddressPools": [
+          {
+            "name": "[variables('nodesLbBackendPoolName')]"
+          }
+        ],
+        "probes": [],
+        "loadBalancingRules": [],
+        "inboundNatRules": [
+          {
+            "name": "[concat('SSH-',variables('vmName'))]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('nodesLbIPConfigID')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": 22,
+              "backendPort": 22,
+              "enableFloatingIP": false
+            }
+          }
+        ]
       }
     },
     {
@@ -219,33 +236,34 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('vmName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "VirtualMachine"
-      },
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('vmName'), '-nic')]",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetNodes'))]"
       ],
       "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySetNodes'))]"
+        },
         "hardwareProfile": {
-          "vmSize": "[variables('vmSize')]"
+          "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[variables('vmName')]",
+          "computername": "[variables('vmName')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
-            "publisher": "[variables('imagePublisher')]",
-            "offer": "[variables('imageOffer')]",
-            "sku": "[parameters('ubuntuOSVersion')]",
+            "publisher": "[variables('osImagePublisher')]",
+            "offer": "[variables('osImageOffer')]",
+            "sku": "[variables('osImageSKU')]",
             "version": "latest"
           },
           "osDisk": {
-            "name": "osdisk",
+            "name": "[concat(variables('vmName'),'-osdisk')]",
             "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName')), '2015-06-15').primaryEndpoints.blob, variables('vhdStorageContainerName'), '/', variables('OSDiskName'), '.vhd')]"
+              "uri": "[concat('http://', parameters('newStorageAccountName'), '.blob.core.windows.net/', variables('vhdBlobContainer'), '/', variables('vmName'), '-osdisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -254,38 +272,29 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('vmName'), '-nic'))]"
             }
           ]
         }
-      },
-      "resources": [
-        {
-          "name": "PrepareServer",
-          "type": "extensions",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "tags": {
-            "displayName": "PrepareServer"
-          },
-          "properties": {
-            "publisher": "Microsoft.OSTCExtensions",
-            "type": "CustomScriptForLinux",
-            "typeHandlerVersion": "1.4",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "[concat(parameters('_artifactsLocation'), '/', variables('scriptFolder'), '/', variables('serverPrepareScriptFileName'), parameters('_artifactsLocationSasToken'))]"
-              ],
-              "commandToExecute": "[concat('sh prepwebserver.sh', ' ', string(parameters('installPHP')), ' ', variables('singleQuote'), variables('testPageMarkup'), variables('singleQuote'), ' ', parameters('testPage'), ' ', variables('singleQuote'), parameters('ubuntuOSVersion'), variables('singleQuote'))]"
-
-            }
-          }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('vmName'), '/configuremaster')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "commandToExecute": "[concat(variables('commandPrefix'), variables('wgetCommandPrefix'), parameters('adminUsername'), variables('wgetCommandPostfix'))]"
         }
-      ]
+      }
     }
   ]
 }
