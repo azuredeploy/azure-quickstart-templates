@@ -46,14 +46,14 @@
     }
   },
   "variables": {
-    "vmName": "test",
+    "vmName": "prova",
     "availabilitySetNodes": "avail-set",
     "osImagePublisher": "Canonical",
     "osImageOffer": "UbuntuServer",
     "osImageSKU" : "16.04.0-LTS",
     "publicIPAddressName": "myPublicIP",
     "publicIPAddressType": "Dynamic",
-    "customScriptLocation": "https://raw.githubusercontent.com/azuredeploy/azure-quickstart-templates/ubuntu-python-script-test",
+    "customScriptLocation": "https://raw.githubusercontent.com/azuredeploy/azure-quickstart-templates/master/ubuntu-python-script-test/",
     "wgetCommandPrefix": "[concat('wget --tries 20 --retry-connrefused --waitretry=15 -qO- ', variables('customScriptLocation'), 'configure-ubuntu.sh | nohup /bin/bash -s ')]",
     "wgetCommandPostfix":  " > /var/log/azure/firstinstall.log 2>&1 &'",
     "commandPrefix": "/bin/bash -c '",
@@ -74,6 +74,12 @@
     "nodesLbIPConfigName": "NodesLBFrontEnd",
     "nodesLbIPConfigID": "[concat(variables('nodesLbID'),'/frontendIPConfigurations/', variables('nodesLbIPConfigName'))]",
     "nodesLbBackendPoolName": "node-pool"
+  },
+  "outputs": {
+    "fqdn": {
+      "type": "string",
+      "value": "[reference(parameters('dnsNameForPublicIP')).dnsSettings.fqdn]"
+    }
   },
   "resources": [
     {
