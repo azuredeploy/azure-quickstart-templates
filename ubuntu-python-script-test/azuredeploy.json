@@ -75,12 +75,6 @@
     "nodesLbIPConfigID": "[concat(variables('nodesLbID'),'/frontendIPConfigurations/', variables('nodesLbIPConfigName'))]",
     "nodesLbBackendPoolName": "node-pool"
   },
-  "outputs": {
-    "fqdn": {
-      "type": "string",
-      "value": "[reference(parameters('dnsNameForPublicIP')).dnsSettings.fqdn]"
-    }
-  },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
