@@ -1,0 +1,24 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "adminPassword": {
+      "value": "Almaviva1"
+    },
+    "dnsNameForPublicIP": {
+      "value": "GEN-UNIQUE"
+    },
+    "ubuntuOSVersion": {
+      "value": "16.04.0-LTS"
+    },
+    "wgetAddressJava": {
+      "value": "http://download.oracle.com/otn-pub/java/jdk/8u101-b13/jdk-8u101-linux-x64.tar.gz"
+    },
+    "wgetAddressActiveMQ": {
+      "value": "https://www.dropbox.com/s/2vwr0o4gv2xr1oc/apache-activemq-5.14.0-bin.tar.gz"
+    }
+  }
+}

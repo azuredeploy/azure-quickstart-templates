@@ -1,0 +1,7 @@
+﻿{
+  "itemDisplayName": "Ubuntu wget and python from git",
+  "description": "This template allows you to quickly create an Ubuntu VM that executes a script from git.",
+  "summary": "Once your VM is created, it downloads a github repo and executes the script associated with it.",
+  "githubUsername": "mavizmaviz@yahoo.it",
+  "dateUpdated": "2016-08-28"
+}
