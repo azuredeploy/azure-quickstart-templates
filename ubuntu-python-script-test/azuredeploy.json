@@ -56,7 +56,7 @@
     "customScriptLocation": "https://raw.githubusercontent.com/azuredeploy/azure-quickstart-templates/master/ubuntu-python-script-test/",
     "wgetCommandPrefix": "[concat('wget --tries 20 --retry-connrefused --waitretry=15 -qO- ', variables('customScriptLocation'), 'configure-ubuntu.sh | nohup /bin/bash -s ')]",
     "wgetCommandPostfix":  " > /var/log/azure/firstinstall.log 2>&1 &'",
-    "wgetConfigPrefix": "[concat('wget --tries 20 --retry-connrefused --waitretry=15 -bqc- ', variables('customScriptLocation'), 'configure-server.py')]",
+    "wgetConfigPrefix": "[concat('wget --tries 20 --retry-connrefused --waitretry=15 -bqc ', variables('customScriptLocation'), 'configure-server.py')]",
     "wgetConfigPostfix": "'",
     "commandPrefix": "/bin/bash -c '",
     "OSDiskName": "osdisk",
