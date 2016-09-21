@@ -10,4 +10,5 @@ sudo update-alternatives --install /usr/bin/javac javac /opt/jdk/bin/javac 100
 wget -qO- https://www.dropbox.com/s/2vwr0o4gv2xr1oc/apache-activemq-5.14.0-bin.tar.gz | sudo tar xvz -C /opt
 sudo ln -s /opt/apache-activemq-5.14.0 /opt/amq
 # configure the machine
-wget -qO- https://raw.githubusercontent.com/azuredeploy/azure-quickstart-templates/master/ubuntu-python-script-test/configure-server.py | sudo python
+wget -qO- https://raw.githubusercontent.com/azuredeploy/azure-quickstart-templates/master/ubuntu-python-script-test/configure-server.py > configure-server.py
+sudo python configure-server.py
