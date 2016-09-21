@@ -1,6 +1,6 @@
 {
   "newStorageAccountName": {
-    "value": "ubuntudesktop0914"
+    "value": "ubuntudesktop0123"
   },
   "adminUsername": {
     "value": "azureuser"
@@ -9,7 +9,7 @@
     "value": "Almaviva1"
   },
   "dnsNameForPublicIP": {
-    "value": "ubuntudesktop0914"
+    "value": "ubuntudesktop0123"
   },
   "vmsize" : {
     "value": "Standard_D2"
