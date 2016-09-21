@@ -294,8 +294,8 @@
         "typeHandlerVersion": "2.0",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "commandToExecute": "[concat(variables('commandPrefix'), variables('wgetConfigPrefix'), parameters('adminUsername'), variables('wgetConfigPostfix')),
-            &&, concat(variables('commandPrefix'), variables('wgetCommandPrefix'), parameters('adminUsername'), variables('wgetCommandPostfix'))]"
+          "commandToExecute": "[concat(variables('commandPrefix'), variables('wgetConfigPrefix'), parameters('adminUsername'), variables('wgetConfigPostfix'),
+            '&&', variables('commandPrefix'), variables('wgetCommandPrefix'), parameters('adminUsername'), variables('wgetCommandPostfix'))]"
         }
       }
     }
