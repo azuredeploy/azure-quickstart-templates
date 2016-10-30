@@ -1,0 +1,1828 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage account name for the cluster"
+      }
+    },
+    "esClusterName": {
+      "type": "string",
+      "defaultValue": "elasticsearch",
+      "metadata": {
+        "description": "The name of the Elasticsearch cluster"
+      }
+    },
+    "esVersion": {
+      "type": "string",
+      "defaultValue": "2.3.1",
+      "allowedValues": [
+        "2.3.1",
+        "2.2.2",
+        "2.1.2"
+      ],
+      "metadata": {
+        "description": "Elasticsearch version to install"
+      }
+    },
+    "dnsName": {
+      "type": "string",
+      "metadata": {
+        "description": "Connect to your cluster using dnsName.cloudapp.net"
+      }
+    },
+    "mysqlPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "password of MySQL Standalone"
+      }
+    },
+    "userName": {
+      "type": "string",
+      "metadata": {
+        "description": "user name to ssh to the VMs"
+      }
+    },
+    "password": {
+      "type": "securestring",
+      "metadata": {
+        "description": "password to ssh to the VMs"
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_A1",
+      "metadata": {
+        "description": "size for the VMs"
+      }
+    },
+    "storageAccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "metadata": {
+        "description": "Storage account type for the cluster"
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "pxcvnet",
+      "metadata": {
+        "description": "Virtual network name for the cluster"
+      }
+    },
+    "feSubnetName": {
+      "type": "string",
+      "defaultValue": "dbsubnet",
+      "metadata": {
+        "description": "subnet n.1 name for the Giotto nodes"
+      }
+    },
+    "dbSubnetName": {
+      "type": "string",
+      "defaultValue": "dbsubnet",
+      "metadata": {
+        "description": "subnet n.2 name for the Giotto nodes"
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+        "description": "IP address in CIDR for virtual network"
+      }
+    },
+    "feSubnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "IP address in CIDR for fe subnet"
+      }
+    },
+        "dbSubnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.2.0/24",
+      "metadata": {
+        "description": "IP address in CIDR for be-db subnet"
+      }
+    },
+    "vmIP1": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM1 must be available in db subnet"
+      }
+    },
+    "vmIP2": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM2 must be available in db subnet"
+      }
+    },
+    "vmIP3": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM3 must be available in db subnet"
+      }
+    },
+    "vmIP4": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM4 must be available in db subnet"
+      }
+    },
+    "vmIP5": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM5 must be available in db subnet"
+      }
+    },
+    "vmIP6": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM6 must be available in db subnet"
+      }
+    },
+    "vmIP7": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM7 must be available in db subnet"
+      }
+    },
+    "vmIP8": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM8 must be available in db subnet"
+      }
+    },
+    "vmIP9": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address for VM9 must be available in db subnet"
+      }
+    },
+    "vmName1": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM1 "
+      }
+    },
+    "vmName2": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM2 "
+      }
+    },
+    "vmName3": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM3 "
+      }
+    },
+    "vmName4": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM4 "
+      }
+    },
+    "vmName5": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM5 "
+      }
+    },
+    "vmName6": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM6 "
+      }
+    },
+    "vmName7": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM7 "
+      }
+    },
+      "vmName8": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM8 "
+      }
+    },
+      "vmName9": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for VM9 "
+      }
+    },
+    "vmNamePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "host name prefix for the VMs"
+      }
+    },
+    "imagePublisher": {
+      "type": "string",
+      "defaultValue": "Canonical",
+      "allowedValues": [
+        "OpenLogic",
+        "Canonical"
+      ],
+      "metadata": {
+        "description": "publisher for the VM OS image"
+      }
+    },
+    "imageOffer": {
+      "type": "string",
+      "defaultValue": "UbuntuServer",
+      "allowedValues": [
+        "CentOS",
+        "UbuntuServer"
+      ],
+      "metadata": {
+        "description": "VM OS name"
+      }
+    },
+    "imageSKU": {
+      "type": "string",
+      "defaultValue": "14.04.2-LTS",
+      "metadata": {
+        "description": "VM OS version"
+      }
+    },
+    "appFrontEndPort": {
+      "type": "int",
+      "defaultValue": 1883,
+      "metadata": {
+        "description": "APP public port"
+      }
+    },
+    "appBackEndPort": {
+      "type": "int",
+      "defaultValue": 1883,
+      "metadata": {
+        "description": "Giotto private port"
+      }
+    },
+    "idleTimeoutInMinutesforILBRule": {
+      "type": "int",
+      "defaultValue": 4,
+      "metadata": {
+        "description": "idel timeout for load balancer"
+      }
+    },
+    "probePort": {
+      "type": "int",
+      "defaultValue": 1883,
+      "metadata": {
+        "description": "cluster health check probe port exposed to load balancer"
+      }
+    },
+    "DiskDataGB": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Size of data disk in GB"
+      }
+    },
+    "probeRequestPath": {
+      "type": "string",
+      "defaultValue": "/",
+      "metadata": {
+        "description": "cluster health check probe path"
+      }
+    },
+    "probeIntervalInSeconds": {
+      "type": "int",
+      "defaultValue": 10,
+      "metadata": {
+        "description": "health check probe interval"
+      }
+    },
+    "numberOfProbes": {
+      "type": "int",
+      "defaultValue": 20,
+      "metadata": {
+        "description": "number of health check probes to consider failure"
+      }
+    },
+    "sshNatRuleFrontEndPort1": {
+      "type": "int",
+      "defaultValue": 443,
+      "metadata": {
+        "description": "public ssh port for VM1"
+      }
+    },
+    "sshNatRuleFrontEndPort2": {
+      "type": "int",
+      "defaultValue": 64002,
+      "metadata": {
+        "description": "public ssh port for VM2"
+      }
+    },
+    "sshNatRuleFrontEndPort3": {
+      "type": "int",
+      "defaultValue": 64003,
+      "metadata": {
+        "description": "public ssh port for VM3"
+      }
+    },
+    "sshNatRuleFrontEndPort4": {
+      "type": "int",
+      "defaultValue": 64004,
+      "metadata": {
+        "description": "public ssh port for VM4"
+      }
+    },
+      "sshNatRuleFrontEndPort5": {
+      "type": "int",
+      "defaultValue": 64005,
+      "metadata": {
+        "description": "public ssh port for VM5"
+      }
+    },
+        "sshNatRuleFrontEndPort6": {
+      "type": "int",
+      "defaultValue": 64006,
+      "metadata": {
+        "description": "public ssh port for VM6"
+      }
+    },
+        "sshNatRuleFrontEndPort7": {
+      "type": "int",
+      "defaultValue": 64007,
+      "metadata": {
+        "description": "public ssh port for VM7"
+      }
+    },
+       "sshNatRuleFrontEndPort8": {
+      "type": "int",
+      "defaultValue": 64008,
+      "metadata": {
+        "description": "public ssh port for VM8"
+      }
+    },
+      "sshNatRuleFrontEndPort9": {
+      "type": "int",
+      "defaultValue": 64009,
+      "metadata": {
+        "description": "public ssh port for VM8"
+      }
+    },
+    "sshNatRuleBackEndPort": {
+      "type": "int",
+      "defaultValue": 22,
+      "metadata": {
+        "description": "private ssh port for the VMs"
+      }
+    },
+    "customScriptFilePath": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/Magopancione/AzureP/master/install_AMQ_WSO2.bash",
+      "metadata": {
+        "description": "bash file location to configure the cluster for WSO2 and ActiveMQ"
+      }
+    },
+   "ElasticScriptFilePath": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/Magopancione/AzureP/master/elasticsearch-ubuntu-installV2.sh",
+      "metadata": {
+        "description": "bash file location to configure the cluster for Elastic installation"
+      }
+    },
+    "customScriptCommandToExecute": {
+      "type": "string",
+      "defaultValue": "bash install_AMQ_WSO2.bash",
+      "metadata": {
+        "description": "bash script command line for WSO2 and ActiveMQ"
+      }
+    },
+    "ElasticScriptCommandToExecute": {
+      "type": "string",
+      "defaultValue": "bash elasticsearch-ubuntu-installV2.sh",
+      "metadata": {
+        "description": "bash script command line for Elastic installation"
+      }
+    }
+  },
+  "variables": {
+    "masterNodesIpPrefix": "[parameters('vmIP7')]", 
+    "esSettings": {
+      "clusterName": "[parameters('esClusterName')]",
+      "version": "[parameters('esVersion')]",
+      "discoveryHosts": "[concat(variables('masterNodesIpPrefix'), '-3')]"
+    },
+    "mastercommandToExecute": "[concat('bash elasticsearch-ubuntu-install.sh -xn ', variables('esSettings').clusterName, ' -v ', variables('esSettings').version, ' -d ', variables('esSettings').discoveryHosts)]",
+    "clientcommandToExecute": "[concat('bash elasticsearch-ubuntu-install.sh -yn ', variables('esSettings').clusterName, ' -v ', variables('esSettings').version, ' -d ', variables('esSettings').discoveryHosts)]",
+    "datacommandToExecute": "[concat('bash elasticsearch-ubuntu-install.sh -zn ', variables('esSettings').clusterName, ' -v ', variables('esSettings').version, ' -d ', variables('esSettings').discoveryHosts)]",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+    "feSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('feSubnetName'))]",
+    "dbSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('dbSubnetName'))]",
+    "lbPublicIPName": "[concat(variables('lbName'), '-publicIP')]",
+    "lbPublicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses',variables('lbPublicIPName'))]",
+    "lbName": "[concat(parameters('vmNamePrefix'), '-lb')]",
+    "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
+    "ilbBackendAddressPoolName": "[concat(parameters('vmNamePrefix'), '-ilbBackendPool')]",
+    "ilbBackendAddressPoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('ilbBackendAddressPoolName'))]",
+    "ilbRuleName": "[concat(parameters('vmNamePrefix'), '-ilbRule')]",
+    "probeName": "[concat(parameters('vmNamePrefix'), '-probe')]",
+    "probeID": "[concat(variables('lbID'),'/probes/',variables('probeName'))]",
+    "sshIPConfigName": "[concat(parameters('vmNamePrefix'), '-sshIPCfg')]",
+    "sshIPConfig": "[concat(variables('lbID'),'/frontendIPConfigurations/',variables('sshIPConfigName'))]",
+    "sshNatRuleName": "[concat(parameters('vmNamePrefix'), '-natRule')]",
+    "sshNatRuleName1": "[concat(variables('sshNatRuleName'), '-1')]",
+    "sshNatRuleName2": "[concat(variables('sshNatRuleName'), '-2')]",
+    "sshNatRuleName3": "[concat(variables('sshNatRuleName'), '-3')]",
+    "sshNatRuleName4": "[concat(variables('sshNatRuleName'), '-4')]",
+    "sshNatRuleName5": "[concat(variables('sshNatRuleName'), '-5')]",
+    "sshNatRuleName6": "[concat(variables('sshNatRuleName'), '-6')]",
+    "sshNatRuleName7": "[concat(variables('sshNatRuleName'), '-7')]",  
+    "sshNatRuleName8": "[concat(variables('sshNatRuleName'), '-8')]",
+    "sshNatRuleName9": "[concat(variables('sshNatRuleName'), '-9')]", 
+    "sshNatRuleID1": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName1'))]",
+    "sshNatRuleID2": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName2'))]",
+    "sshNatRuleID3": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName3'))]",
+    "sshNatRuleID4": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName4'))]",
+    "sshNatRuleID5": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName5'))]",
+    "sshNatRuleID6": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName6'))]",
+    "sshNatRuleID7": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName7'))]",
+    "sshNatRuleID8": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName8'))]",
+    "sshNatRuleID9": "[concat(variables('lbID'),'/inboundNatRules/',variables('sshNatRuleName9'))]",
+    "nicName": "[concat(parameters('vmNamePrefix'), '-nic')]",
+    "nicName1": "[concat(variables('nicName'),'-1')]",
+    "nicName2": "[concat(variables('nicName'),'-2')]",
+    "nicName3": "[concat(variables('nicName'),'-3')]",
+    "nicName4": "[concat(variables('nicName'),'-4')]",
+    "nicName5": "[concat(variables('nicName'),'-5')]",
+    "nicName6": "[concat(variables('nicName'),'-6')]",
+    "nicName7": "[concat(variables('nicName'),'-7')]",
+    "nicName8": "[concat(variables('nicName'),'-8')]",
+    "nicName9": "[concat(variables('nicName'),'-9')]",
+    "nicId1": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName1'))]",
+    "nicId2": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName2'))]",
+    "nicId3": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName3'))]",
+    "nicId4": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName4'))]",
+    "nicId5": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName5'))]",
+    "nicId6": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName6'))]",
+    "nicId7": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName7'))]",
+    "nicId8": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName8'))]",
+    "nicId9": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName9'))]",
+    "availabilitySetName": "[concat(parameters('vmNamePrefix'), '-set')]",
+    "vmExtensionName": "[concat(parameters('vmNamePrefix'), '-ext')]",
+    "vhdContainer1": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm1vhds/')]",
+    "dataDisk1VhdName1": "[concat(variables('vhdContainer1'),parameters('vmName1'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName1": "[concat(variables('vhdContainer1'),parameters('vmName1'),'dataDisk2.vhd')]",
+    "executeParamVm1":  "[concat(parameters('customScriptCommandToExecute'), ' -m Q1 -s  NA -p  NA -t ACTIVEMQ')]",
+	"executeParamVm2":  "[concat(parameters('customScriptCommandToExecute'), ' -m Q2 -s  NA -p  NA -t ACTIVEMQ')]",
+	"executeParamVm3":  "[concat(parameters('customScriptCommandToExecute'), ' -m ESB -s  NA -p  NA -t ESB')]",
+	"executeParamVm4":  "[concat(parameters('customScriptCommandToExecute'), ' -m CEP -s  NA -p  NA -t CEP')]",
+	"executeParamVm5":  "[concat(parameters('customScriptCommandToExecute'), ' -m IS -s  NA -p  NA -t IS')]",
+	"executeParamVm6":  "[concat(parameters('customScriptCommandToExecute'), ' -m Mysql -s  NA -p  ', parameters('mysqlPassword'),' -t MYSQL')]",
+	"executeParamVm7":  "[concat(parameters('ElasticScriptCommandToExecute'), ' -xn ', variables('esSettings').clusterName, ' -v ', variables('esSettings').version, ' -d ', variables('esSettings').discoveryHosts)]",
+	"executeParamVm8":  "[concat(parameters('ElasticScriptCommandToExecute'), ' -xn ', variables('esSettings').clusterName, ' -v ', variables('esSettings').version, ' -d ', variables('esSettings').discoveryHosts)]",
+	"executeParamVm9":  "[concat(parameters('ElasticScriptCommandToExecute'), ' -xn ', variables('esSettings').clusterName, ' -v ', variables('esSettings').version, ' -d ', variables('esSettings').discoveryHosts)]",
+    "vmExtensionName1": "[concat(parameters('vmName1'),'/', variables('vmExtensionName'))]",
+    "vhdContainer2": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm2vhds/')]",
+    "dataDisk1VhdName2": "[concat(variables('vhdContainer2'),parameters('vmName2'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName2": "[concat(variables('vhdContainer2'),parameters('vmName2'),'dataDisk2.vhd')]",
+    "vhdContainer3": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm3vhds/')]",
+    "dataDisk1VhdName3": "[concat(variables('vhdContainer3'),parameters('vmName3'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName3": "[concat(variables('vhdContainer3'),parameters('vmName3'),'dataDisk2.vhd')]",
+    "vhdContainer4": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm4vhds/')]",
+    "dataDisk1VhdName4": "[concat(variables('vhdContainer4'),parameters('vmName4'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName4": "[concat(variables('vhdContainer4'),parameters('vmName4'),'dataDisk2.vhd')]",
+    "vhdContainer5": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm5vhds/')]",
+    "dataDisk1VhdName5": "[concat(variables('vhdContainer5'),parameters('vmName5'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName5": "[concat(variables('vhdContainer5'),parameters('vmName5'),'dataDisk2.vhd')]",
+    "vhdContainer6": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm6vhds/')]",
+    "dataDisk1VhdName6": "[concat(variables('vhdContainer6'),parameters('vmName6'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName6": "[concat(variables('vhdContainer6'),parameters('vmName6'),'dataDisk2.vhd')]",
+    "vhdContainer7": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm7vhds/')]",
+    "dataDisk1VhdName7": "[concat(variables('vhdContainer7'),parameters('vmName7'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName7": "[concat(variables('vhdContainer7'),parameters('vmName7'),'dataDisk2.vhd')]",
+    "vhdContainer8": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm8vhds/')]",
+    "dataDisk1VhdName8": "[concat(variables('vhdContainer8'),parameters('vmName8'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName8": "[concat(variables('vhdContainer8'),parameters('vmName8'),'dataDisk2.vhd')]",
+    "vhdContainer9": "[concat('http://',parameters('storageAccount'),'.blob.core.windows.net/vm9vhds/')]",
+    "dataDisk1VhdName9": "[concat(variables('vhdContainer9'),parameters('vmName9'),'dataDisk1.vhd')]",
+    "dataDisk2VhdName9": "[concat(variables('vhdContainer9'),parameters('vmName9'),'dataDisk2.vhd')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('storageAccount')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "accountType": "[parameters('storageAccountType')]"
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('lbPublicIPName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsName')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('availabilitySetName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "properties": {}
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('feSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('feSubnetAddressPrefix')]"
+            }    
+          },
+             {
+            "name": "[parameters('dbSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('dbSubnetAddressPrefix')]"
+            }    
+          }
+                               
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName1')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP1')]",
+              "subnet": {
+                "id": "[variables('feSubnetRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[variables('ilbBackendAddressPoolID')]"
+                }
+              ],
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID1')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName2')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP2')]",
+              "subnet": {
+                "id": "[variables('feSubnetRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[variables('ilbBackendAddressPoolID')]"
+                }
+              ],
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID2')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName3')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP3')]",
+              "subnet": {
+                "id": "[variables('feSubnetRef')]"
+              },
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID3')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName4')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP4')]",
+              "subnet": {
+                "id": "[variables('feSubnetRef')]"
+              },
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID4')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName5')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP5')]",
+              "subnet": {
+                "id": "[variables('feSubnetRef')]"
+              },
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID5')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+        {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName6')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP6')]",
+              "subnet": {
+                "id": "[variables('dbSubnetRef')]"
+              },
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID6')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+        {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName7')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP7')]",
+              "subnet": {
+                "id": "[variables('dbSubnetRef')]"
+              },
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID7')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+        {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName8')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP8')]",
+              "subnet": {
+                "id": "[variables('dbSubnetRef')]"
+              },
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID8')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+        {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName9')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('vmIP9')]",
+              "subnet": {
+                "id": "[variables('dbSubnetRef')]"
+              },
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[variables('sshNatRuleID9')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('vmName1')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName1'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName1')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer1'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName1')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+             "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName1')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId1')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[variables('vmExtensionName1')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName1'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('customScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+          "commandToExecute": "[variables('executeParamVm1')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName2')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName2'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName2')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer2'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+			  "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName2')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName2')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId2')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName2'),'/', variables('vmExtensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName2'))]",
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName1'),'/extensions/',variables('vmExtensionName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('customScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+                "commandToExecute": "[variables('executeParamVm2')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName3')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName3'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName3')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer3'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+               "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName3')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName3')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId3')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName3'),'/', variables('vmExtensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName3'))]",
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName5'),'/extensions/',variables('vmExtensionName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('customScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+                   "commandToExecute": "[variables('executeParamVm3')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName4')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName4'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName4')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer4'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+               "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName4')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+               "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName4')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId4')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName4'),'/', variables('vmExtensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName4'))]",
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName5'),'/extensions/',variables('vmExtensionName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('customScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+                  "commandToExecute": "[variables('executeParamVm4')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName5')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName5'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName5')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer5'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+               "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName5')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+               "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName5')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId5')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName5'),'/', variables('vmExtensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName5'))]",
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName6'),'/extensions/',variables('vmExtensionName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('customScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+                  "commandToExecute": "[variables('executeParamVm5')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName6')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName6'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName6')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer6'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+               "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName6')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+               "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName6')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId6')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName6'),'/', variables('vmExtensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName6'))]",
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName1'),'/extensions/',variables('vmExtensionName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('customScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+                  "commandToExecute": "[variables('executeParamVm6')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName7')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName7'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName7')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer7'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName7')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName7')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId7')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName7'),'/', variables('vmExtensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName7'))]",
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName6'),'/extensions/',variables('vmExtensionName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('ElasticScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+                  "commandToExecute": "[variables('executeParamVm7')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName8')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName8'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName8')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer8'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName8')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName8')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId8')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName8'),'/', variables('vmExtensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName8'))]",
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName7'),'/extensions/',variables('vmExtensionName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('ElasticScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+                 "commandToExecute": "[variables('executeParamVm8')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName9')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName9'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName9')]",
+          "adminUsername": "[parameters('userName')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(variables('vhdContainer9'), 'osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[variables('dataDisk1VhdName9')]"
+              },
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+              "diskSizeGB": "[parameters('DiskDataGB')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[variables('dataDisk2VhdName9')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId9')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName9'),'/', variables('vmExtensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName9'))]",
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName7'),'/extensions/',variables('vmExtensionName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('ElasticScriptFilePath')]"
+          ]
+        },
+        "protectedSettings": {
+                  "commandToExecute": "[variables('executeParamVm9')]"
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/loadBalancers",
+      "name": "[variables('lbName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('lbPublicIPName'))]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "[variables('sshIPConfigName')]",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[variables('lbPublicIPRef')]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[variables('ilbBackendAddressPoolName')]"
+          }
+        ],
+        "inboundNatRules": [
+          {
+            "name": "[variables('sshNatRuleName1')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort1')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          },
+          {
+            "name": "[variables('sshNatRuleName2')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort2')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          },
+          {
+            "name": "[variables('sshNatRuleName3')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort3')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          },
+          {
+            "name": "[variables('sshNatRuleName4')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort4')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          },
+          {
+            "name": "[variables('sshNatRuleName5')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort5')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          },
+          {
+            "name": "[variables('sshNatRuleName6')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort6')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          },
+          {
+            "name": "[variables('sshNatRuleName7')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort7')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          },
+                    {
+            "name": "[variables('sshNatRuleName8')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort8')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          },
+
+          {
+            "name": "[variables('sshNatRuleName9')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[parameters('sshNatRuleFrontEndPort9')]",
+              "backendPort": "[parameters('sshNatRuleBackEndPort')]",
+              "enableFloatingIP": false
+            }
+          }
+
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "[variables('ilbRuleName')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sshIPConfig')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('ilbBackendAddressPoolID')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": "[parameters('appFrontEndPort')]",
+              "backendPort": "[parameters('appBackEndPort')]",
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": "[parameters('idleTimeoutInMinutesforILBRule')]",
+              "probe": {
+                "id": "[variables('probeID')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "[variables('probeName')]",
+            "properties": {
+              "protocol": "Http",
+              "port": "[parameters('probePort')]",
+              "intervalInSeconds": "[parameters('probeIntervalInSeconds')]",
+              "numberOfProbes": "[parameters('numberOfProbes')]",
+              "requestPath": "[parameters('probeRequestPath')]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
