@@ -1,8 +1,5 @@
 #!/bin/bash
 
-
-
-
 mylog()
 {
     # If you want to enable this logging add a un-comment the line below and add your account id
