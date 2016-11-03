@@ -23,4 +23,5 @@ org-clock-save.el
 emacs-config.el
 .vscode/settings.json
 
+# ignore giotto related files
 /000-giotto
