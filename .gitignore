@@ -23,3 +23,4 @@ org-clock-save.el
 emacs-config.el
 .vscode/settings.json
 
+/000-giotto
